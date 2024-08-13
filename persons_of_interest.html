@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persons of Interest</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333; /* Dark text color */
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/background.png'); /* Path to background image */
+            background-size: cover; /* Cover background */
+            background-position: center;
+            filter: blur(8px); /* Blur effect for background */
+            z-index: -1; /* Behind other content */
+        }
+
+        .persons-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: rgba(255, 255, 255, 0.9); /* Transparent white background for container */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .logo {
+            width: 200px; /* Reduced size of the logo */
+            margin-bottom: 1em;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #e60000; /* Red text color */
+        }
+
+        .person-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-height: 400px; /* Max height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        .person-item {
+            width: calc(33.33% - 2em); /* Adjusted width for responsiveness */
+            margin: 1em;
+            padding: 1em;
+            background-color: #ffffff; /* White background */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .person-item img {
+            width: 150px; /* Reduced size of the images */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .person-item h2 {
+            font-size: 1.2em; /* Adjusted font size */
+            color: #007bff; /* Blue text color */
+            margin: 0.5em 0;
+        }
+
+        .person-item p {
+            font-size: 1em; /* Adjusted font size */
+            color: #666; /* Medium gray text color */
+            margin: 0.5em 0;
+        }
+
+        .person-item .title {
+            font-weight: bold;
+            margin-top: 0.5em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+            color: #333; /* Dark text color */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 1em;
+            border-radius: 8px;
+        }
+
+        .classified-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .menu-text {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .menu-text p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .menu-text a {
+            color: #003399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .menu-text a:hover {
+            text-decoration: underline;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="background-image"></div>
+
+    <div class="persons-container">
+        <img src="images/FERG_DIPLOMACY.png" alt="FERG_PERSONS" class="logo">
+        <h1>Persons of Interest</h1>
+        <div class="person-grid"></div>
+        <div class="menu-text">
+            <p>If you want see more details click <a href="https://trello.com/b/S4PtseIz/ferg-factions-persons-of-interest">here</a></p>
+        </div>
+    </div>
+
+    <div id="personModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="Person Image">
+            <h2 id="modalName">Person Name</h2>
+            <p id="modalTitle" class="title">Title: </p>
+            <p id="modalDescription">Detailed description.</p>
+        </div>
+    </div>
+
+    <button id="classifiedButton" class="classified-button">Classified</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const persons = [
+                {
+                    name: "John Doe",
+                    title: "Mysterious Navigator",
+                    description: "John Doe is a mysterious individual who has been known to navigate the Backrooms for years. Little is known about his origins or motivations, but he often appears in critical situations to offer aid or information to weary travelers.",
+                    image: "images/john_doe.png"
+                },
+                {
+                    name: "Jane Smith",
+                    title: "Resourceful Explorer",
+                    description: "Jane Smith is a skilled navigator of the Backrooms, renowned for her survival instincts and resourcefulness. She operates independently but is known to collaborate with various factions and individuals when necessary.",
+                    image: "images/jane_smith.png"
+                },
+                {
+                    name: "Dr. Alexander Gray",
+                    title: "Dimensional Scientist",
+                    description: "Dr. Alexander Gray is a scientist who became obsessed with the dimensional anomalies of the Backrooms. He conducts risky experiments to understand the nature of reality within this labyrinthine realm.",
+                    image: "images/dr_gray.png"
+                },
+                {
+                    name: "Agent Cipher",
+                    title: "Covert Operative",
+                    description: "Agent Cipher is a covert operative specializing in reconnaissance and intelligence gathering within the Backrooms. Their identity and affiliations remain classified, adding to the air of mystery surrounding their operations.",
+                    image: "images/agent_cipher.png"
+                },
+                {
+                    name: "Evelyn Green",
+                    title: "Ecologist",
+                    description: "Evelyn Green is an explorer who documents the flora and fauna of the Backrooms. Her detailed field notes provide valuable insights into the ecological systems that exist within this extradimensional space.",
+                    image: "images/evelyn_green.png"
+                },
+                {
+                    name: "Captain Valeria",
+                    title: "Airship Captain",
+                    description: "Captain Valeria is a fearless leader of a crew that navigates the Backrooms aboard their airship, The Horizon Voyager. Known for her strategic mind and unwavering determination, she seeks to chart new territories and uncover hidden treasures.",
+                    image: "images/captain_valeria.png"
+                },
+                {
+                    name: "Professor Atlas",
+                    title: "Artifact Scholar",
+                    description: "Professor Atlas is an esteemed scholar who specializes in ancient artifacts found within the Backrooms. His expertise in deciphering cryptic symbols and texts sheds light on the mysterious history of this enigmatic realm.",
+                    image: "images/professor_atlas.png"
+                },
+                {
+                    name: "The Nomad",
+                    title: "Wanderer",
+                    description: "The Nomad is a solitary figure who roams the Backrooms with no fixed destination. Known for their survival skills and knowledge of secret passages, they are sought after by travelers seeking safe routes or hidden treasures.",
+                    image: "images/the_nomad.png"
+                }
+            ];
+
+            const personGrid = document.querySelector(".person-grid");
+
+            persons.forEach(person => {
+                const item = document.createElement("div");
+                item.classList.add("person-item");
+                item.dataset.name = person.name;
+                item.dataset.description = person.description;
+                item.dataset.title = person.title;
+
+                const img = document.createElement("img");
+                img.src = person.image;
+                img.alt = person.name; // Set alt attribute for accessibility
+
+                const h2 = document.createElement("h2");
+                h2.textContent = person.name;
+
+                const title = document.createElement("p");
+                title.classList.add("title");
+                title.textContent = `Title: ${person.title}`;
+
+                const description = document.createElement("p");
+                description.textContent = person.description.length > 120 ? `${person.description.slice(0, 120)}...` : person.description;
+
+                item.appendChild(img);
+                item.appendChild(h2);
+                item.appendChild(title);
+                item.appendChild(description);
+
+                item.addEventListener("click", function() {
+                    const modal = document.getElementById("personModal");
+                    const modalImage = document.getElementById("modalImage");
+                    const modalName = document.getElementById("modalName");
+                    const modalTitle = document.getElementById("modalTitle");
+                    const modalDescription = document.getElementById("modalDescription");
+
+                    modal.style.display = "block";
+                    modalImage.src = person.image;
+                    modalImage.alt = person.name;
+                    modalName.textContent = person.name;
+                    modalTitle.textContent = `Title: ${person.title}`;
+                    modalDescription.textContent = person.description;
+                });
+
+                personGrid.appendChild(item);
+            });
+
+            const modal = document.getElementById("personModal");
+            const closeBtn = document.querySelector(".close");
+
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            // Handling Classified Button
+            const classifiedButton = document.getElementById("classifiedButton");
+
+            classifiedButton.addEventListener("click", function() {
+                const password = prompt("Enter the password to access Classified:");
+                if (password === "1995.8.19") {
+                    window.location.href = "classified.html"; // Redirect to classified page
+                } else {
+                    alert("Incorrect password. Access denied.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

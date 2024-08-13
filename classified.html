@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classified</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #333; /* Dark background color */
+            color: #fff; /* White text color */
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/classified_background.jpg'); /* Path to background image */
+            background-repeat: repeat; /* Repeat background image */
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .entities-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: rgba(0, 0, 0, 0.8); /* Transparent black background for container */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .logo {
+            width: 200px; /* Reduced size of the logo */
+            margin-bottom: 1em;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: red;
+        }
+
+        .entity-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-height: 400px; /* Max height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        .entity-item {
+            width: calc(33.33% - 2em); /* Adjusted width for responsiveness */
+            margin: 1em;
+            padding: 1em;
+            background-color: #555; /* Darker background color for entities */
+            border: 1px solid #777;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .entity-item img {
+            width: 150px; /* Reduced size of the images */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .entity-item h2 {
+            font-size: 1.2em; /* Adjusted font size */
+            color: #007bff;
+            margin: 0.5em 0;
+        }
+
+        .entity-item p {
+            font-size: 1em; /* Adjusted font size */
+            color: #ccc;
+            margin: 0.5em 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+            color: #333; /* Dark text color for modal */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 1em;
+            border-radius: 8px;
+        }
+
+        .classified-warning {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #003399;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .back-button:hover {
+            background-color: #001f4d;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-image">
+        <div class="entities-container">
+            <img src="images/FERG_INCIDENTS.png" alt="FERG_INCIDENTS" class="logo">
+            <h1>Classified Incidents</h1>
+            <div class="entity-grid">
+                <!-- Entity items dynamically created with JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div id="entityModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="Incident Image">
+            <h2 id="modalName">Incident Name</h2>
+            <p id="modalNumber">Incident Number: </p>
+            <p id="modalDescription">Description: </p>
+            <p id="modalNote">Note: </p>
+        </div>
+    </div>
+
+    <div class="classified-warning">
+        <p>This page contains sensitive information related to FERG incidents. Access is restricted to personnel with Explorer Specialist rank or higher.</p>
+    </div>
+
+    <button class="back-button" onclick="goToMainPage()">Back to Main</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const incidents = [
+                {
+                    name: "Incident 1",
+                    number: "001",
+                    description: "Description of Incident 1.",
+                    image: "images/incident1.png",
+                    note: "Note for Incident 1."
+                },
+                {
+                    name: "Incident 2",
+                    number: "002",
+                    description: "Description of Incident 2.",
+                    image: "images/incident2.png",
+                    note: "Note for Incident 2."
+                },
+                {
+                    name: "Incident 3",
+                    number: "003",
+                    description: "Description of Incident 3.",
+                    image: "images/incident3.png",
+                    note: "Note for Incident 3."
+                },
+                {
+                    name: "Incident 4",
+                    number: "004",
+                    description: "Description of Incident 4.",
+                    image: "images/incident4.png",
+                    note: "Note for Incident 4."
+                },
+                {
+                    name: "Incident 5",
+                    number: "005",
+                    description: "Description of Incident 5.",
+                    image: "images/incident5.png",
+                    note: "Note for Incident 5."
+                },
+                {
+                    name: "Incident 6",
+                    number: "006",
+                    description: "Description of Incident 6.",
+                    image: "images/incident6.png",
+                    note: "Note for Incident 6."
+                },
+                {
+                    name: "Incident 7",
+                    number: "007",
+                    description: "Description of Incident 7.",
+                    image: "images/incident7.png",
+                    note: "Note for Incident 7."
+                },
+                {
+                    name: "Incident 8",
+                    number: "008",
+                    description: "Description of Incident 8.",
+                    image: "images/incident8.png",
+                    note: "Note for Incident 8."
+                }
+            ];
+
+            const entityGrid = document.querySelector(".entity-grid");
+
+            incidents.forEach(incident => {
+                const item = document.createElement("div");
+                item.classList.add("entity-item");
+                item.dataset.name = incident.name;
+                item.dataset.number = incident.number;
+                item.dataset.description = incident.description;
+                item.dataset.note = incident.note;
+
+                const img = document.createElement("img");
+                img.src = incident.image;
+                img.alt = incident.name; // Set alt attribute for accessibility
+
+                const h2 = document.createElement("h2");
+                h2.textContent = incident.name;
+
+                const number = document.createElement("p");
+                number.textContent = `Incident Number: ${incident.number}`;
+
+                const description = document.createElement("p");
+                description.textContent = `Description: ${incident.description}`;
+
+                const note = document.createElement("p");
+                note.textContent = `Note: ${incident.note}`;
+
+                item.appendChild(img);
+                item.appendChild(h2);
+                item.appendChild(number);
+                item.appendChild(description);
+                item.appendChild(note);
+
+                item.addEventListener("click", function() {
+                    const modal = document.getElementById("entityModal");
+                    const modalImage = document.getElementById("modalImage");
+                    const modalName = document.getElementById("modalName");
+                    const modalNumber = document.getElementById("modalNumber");
+                    const modalDescription = document.getElementById("modalDescription");
+                    const modalNote = document.getElementById("modalNote");
+
+                    modal.style.display = "block";
+                    modalImage.src = incident.image;
+                    modalImage.alt = incident.name;
+                    modalName.textContent = incident.name;
+                    modalNumber.textContent = `Incident Number: ${incident.number}`;
+                    modalDescription.textContent = `Description: ${incident.description}`;
+                    modalNote.textContent = `Note: ${incident.note}`;
+                });
+
+                entityGrid.appendChild(item);
+            });
+
+            const modal = document.getElementById("entityModal");
+            const closeBtn = document.querySelector(".close");
+
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+        function goToMainPage() {
+            window.location.href = "main.html"; // Replace with the actual path to your main page
+        }
+    </script>
+</body>
+</html>

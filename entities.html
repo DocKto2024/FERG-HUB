@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entities</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333; /* Dark text color */
+            overflow: hidden; /* Prevent scrolling on background */
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/background.png'); /* Path to background image */
+            background-size: cover; /* Cover background */
+            background-position: center;
+            filter: blur(8px); /* Blur effect for background */
+            z-index: -1; /* Behind other content */
+        }
+
+        .entities-container {
+            position: relative;
+            max-width: 800px;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: #ffffff; /* White background for container */
+            border: 1px solid #999;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 200px; /* Reduced size of the logo */
+            margin-bottom: 1em;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #003399; /* Dark blue text color */
+            margin-bottom: 0.5em;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .entity-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-height: 400px; /* Max height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding-right: 20px; /* Compensate for scrollbar width */
+        }
+
+        .entity-item {
+            width: calc(33.33% - 20px); /* Adjusted width for responsiveness */
+            margin: 1em;
+            padding: 1em;
+            background-color: #f0f0f0; /* Light gray background */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative; /* Ensure z-index works */
+        }
+
+        .entity-item img {
+            width: 150px; /* Reduced size of the images */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .entity-item h2 {
+            font-size: 1.2em; /* Adjusted font size */
+            color: #003399; /* Dark blue text color */
+            margin: 0.5em 0;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .entity-item p {
+            font-size: 1em; /* Adjusted font size */
+            color: #666; /* Medium gray text color */
+            margin: 0.5em 0;
+            text-align: center;
+        }
+
+        .entity-item .danger-level {
+            font-weight: bold;
+            color: #ff0000; /* Red text color */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            max-width: 80%;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            color: #333; /* Dark text color */
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #666; /* Medium gray text color */
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000; /* Black text color on hover */
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #003399; /* Dark blue */
+            color: #fff; /* White text */
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #001f4d; /* Darker blue on hover */
+        }
+
+        .menu-text {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .menu-text p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .menu-text a {
+            color: #003399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .menu-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-image"></div>
+
+    <div class="entities-container">
+        <img src="images/FERG_ENTITIES.png" alt="FERG_ENTITIES" class="logo">
+        <h1>Entities</h1>
+        <div class="entity-grid"></div>
+        <div class="menu-text">
+            <p>If you want see more details click <a href="https://trello.com/b/gGkgK5Vl/ferg-entities-data-base">here</a></p>
+        </div>
+    </div>
+
+    <div id="entityModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="Entity Image">
+            <h2 id="modalName">Entity Name</h2>
+            <p id="modalDanger">Danger Level: </p>
+            <p id="modalDescription">Detailed description.</p>
+            <p id="modalHabitat">Habitat: </p>
+            <p id="modalNote">Note: </p>
+        </div>
+    </div>
+
+    <button id="backButton" class="back-button">Back to Main</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const entities = [
+                {
+                    name: "Demon",
+                    description: "Its a type of bacteria. Have very weak body. Low intelligence. Mantis-like arms.",
+                    image: "images/mantis.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Demon.",
+                    note: "Hide in the dark, best option."
+                },
+                {
+                    name: "Sprinter",
+                    description: "Have 2 spiked heads that may be his eyes. Pretty fast. Also called as: Scout, patroller.",
+                    image: "images/sprinter.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Sprinter.",
+                    note: "You can hear his loud and fast footsteps when he's running, hide in dark best option."
+                },
+                {
+                    name: "The Watcher",
+                    description: "Have one big eye and human like body. High level of intelligence, enough to do stuff like turn on light in room used switch and use tactics in fight. Has 2 processes at the back.",
+                    image: "images/the_watcher.png",
+                    danger: "Caution",
+                    detail: "Detailed description for The Watcher.",
+                    note: "If you think it stopped followed you, you wrong."
+                },
+                {
+                    name: "Formulate",
+                    description: "The bacteria entity. Have 2 projectors on body what it use to see in darkness. Pretty fast.",
+                    image: "images/formulate.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Formulate.",
+                    note: "Missing"
+                },
+                {
+                    name: "Entity 5",
+                    description: "Description for Entity 5.",
+                    image: "images/entity5.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Entity 5.",
+                    note: "Note for Entity 5."
+                },
+                {
+                    name: "Entity 6",
+                    description: "Description for Entity 6.",
+                    image: "images/entity6.png",
+                    danger: "Caution",
+                    detail: "Detailed description for Entity 6.",
+                    note: "Note for Entity 6."
+                },
+                {
+                    name: "Entity 7",
+                    description: "Description for Entity 7.",
+                    image: "images/entity7.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Entity 7.",
+                    note: "Note for Entity 7."
+                },
+                {
+                    name: "Entity 8",
+                    description: "Description for Entity 8.",
+                    image: "images/entity8.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Entity 8.",
+                    note: "Note for Entity 8."
+                },
+                {
+                    name: "Entity 9",
+                    description: "Description for Entity 9.",
+                    image: "images/entity9.png",
+                    danger: "Caution",
+                    detail: "Detailed description for Entity 9.",
+                    note: "Note for Entity 9."
+                },
+                {
+                    name: "Entity 10",
+                    description: "Description for Entity 10.",
+                    image: "images/entity10.png",
+                    danger: "Danger",
+                    detail: "Detailed description for Entity 10.",
+                    note: "Note for Entity 10."
+                }
+            ];
+
+            const entityGrid = document.querySelector(".entity-grid");
+
+            entities.forEach(entity => {
+                const item = document.createElement("div");
+                item.classList.add("entity-item");
+                item.dataset.name = entity.name;
+                item.dataset.description = entity.description;
+                item.dataset.danger = entity.danger;
+                item.dataset.detail = entity.detail;
+                item.dataset.note = entity.note;
+
+                const img = document.createElement("img");
+                img.src = entity.image;
+                img.alt = entity.name; // Set alt attribute for accessibility
+
+                const h2 = document.createElement("h2");
+                h2.textContent = entity.name;
+
+                const description = document.createElement("p");
+                description.textContent = entity.description;
+
+                const dangerLevel = document.createElement("p");
+                dangerLevel.classList.add("danger-level");
+                dangerLevel.textContent = `Danger Level: ${entity.danger}`;
+
+                item.appendChild(img);
+                item.appendChild(h2);
+                item.appendChild(description);
+                item.appendChild(dangerLevel);
+
+                item.addEventListener("click", function() {
+                    const modal = document.getElementById("entityModal");
+                    const modalImage = document.getElementById("modalImage");
+                    const modalName = document.getElementById("modalName");
+                    const modalDanger = document.getElementById("modalDanger");
+                    const modalDescription = document.getElementById("modalDescription");
+                    const modalHabitat = document.getElementById("modalHabitat");
+                    const modalNote = document.getElementById("modalNote");
+
+                    modal.style.display = "block";
+                    modalImage.src = entity.image;
+                    modalImage.alt = entity.name;
+                    modalName.textContent = entity.name;
+                    modalDanger.textContent = `Danger Level: ${entity.danger}`;
+                    modalDescription.textContent = entity.detail;
+                    modalHabitat.textContent = `Habitat: Not specified`; // Replace with actual habitat if available
+                    modalNote.textContent = `Note: ${entity.note}`;
+                });
+
+                entityGrid.appendChild(item);
+            });
+
+            const modal = document.getElementById("entityModal");
+            const closeBtn = document.querySelector(".close");
+
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            // Handling Back Button
+            const backButton = document.getElementById("backButton");
+
+            backButton.addEventListener("click", function() {
+                window.location.href = "main.html"; // Replace with your main page URL
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333; /* Dark text color */
+            overflow: hidden; /* Prevent scrolling on background */
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/background.png'); /* Path to background image */
+            background-size: cover; /* Cover background */
+            background-position: center;
+            filter: blur(8px); /* Blur effect for background */
+            z-index: -1; /* Behind other content */
+        }
+
+        .factions-container {
+            position: relative;
+            max-width: 800px;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: #ffffff; /* White background for container */
+            border: 1px solid #999;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 200px; /* Reduced size of the logo */
+            margin-bottom: 1em;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #003399; /* Dark blue text color */
+            margin-bottom: 0.5em;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .faction-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-height: 400px; /* Max height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding-right: 20px; /* Compensate for scrollbar width */
+        }
+
+        .faction-item {
+            width: calc(33.33% - 20px); /* Adjusted width for responsiveness */
+            margin: 1em;
+            padding: 1em;
+            background-color: #f0f0f0; /* Light gray background */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative; /* Ensure z-index works */
+        }
+
+        .faction-item img {
+            width: 150px; /* Reduced size of the images */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .faction-item h2 {
+            font-size: 1.2em; /* Adjusted font size */
+            color: #003399; /* Dark blue text color */
+            margin: 0.5em 0;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .faction-item p {
+            font-size: 1em; /* Adjusted font size */
+            color: #666; /* Medium gray text color */
+            margin: 0.5em 0;
+            text-align: center;
+        }
+
+        .faction-item .strength-level {
+            font-weight: bold;
+            color: #008000; /* Green text color */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            max-width: 80%;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            color: #333; /* Dark text color */
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #666; /* Medium gray text color */
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000; /* Black text color on hover */
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #003399; /* Dark blue */
+            color: #fff; /* White text */
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #001f4d; /* Darker blue on hover */
+        }
+
+        .menu-text {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .menu-text p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .menu-text a {
+            color: #003399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .menu-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-image"></div>
+
+    <div class="factions-container">
+        <img src="images/FERG_DIPLOMACY.png" alt="FERG_FACTIONS" class="logo">
+        <h1>Factions</h1>
+        <div class="faction-grid"></div>
+        <div class="menu-text">
+            <p>If you want see more details click <a href="https://trello.com/b/S4PtseIz/ferg-factions-persons-of-interest">here</a></p>
+        </div>
+    </div>
+
+    <div id="factionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="Faction Image">
+            <h2 id="modalName">Faction Name</h2>
+            <p id="modalStrength">Strength Level: </p>
+            <p id="modalDescription">Detailed description.</p>
+            <p id="modalLeader">Leader: </p>
+            <p id="modalLocation">Location: </p>
+        </div>
+    </div>
+
+    <button id="backButton" class="back-button">Back to Main</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const factions = [
+                {
+                    name: "Shadow Corporation",
+                    description: "A secretive organization with advanced technology and global influence.",
+                    image: "images/shadow_corp.png",
+                    strength: "High",
+                    detail: "Detailed description for Shadow Corporation.",
+                    leader: "Unknown",
+                    location: "Global"
+                },
+                {
+                    name: "Northern Alliance",
+                    description: "An alliance of northern territories known for their resilience and resourcefulness.",
+                    image: "images/northern_alliance.png",
+                    strength: "Medium",
+                    detail: "Detailed description for Northern Alliance.",
+                    leader: "Commander Ivanov",
+                    location: "Northern Territories"
+                },
+                {
+                    name: "Crimson Syndicate",
+                    description: "A criminal syndicate operating in urban areas, known for their ruthlessness and underworld connections.",
+                    image: "images/crimson_syndicate.png",
+                    strength: "High",
+                    detail: "Detailed description for Crimson Syndicate.",
+                    leader: "The Crimson King",
+                    location: "Urban Areas"
+                },
+                {
+                    name: "Nomad Tribes",
+                    description: "Nomadic tribes roaming desert lands, skilled in survival and adaptation.",
+                    image: "images/nomad_tribes.png",
+                    strength: "Low",
+                    detail: "Detailed description for Nomad Tribes.",
+                    leader: "Chieftain Ahmet",
+                    location: "Desert Lands"
+                },
+                {
+                    name: "Tech Union",
+                    description: "An alliance of tech-savvy corporations, driving innovation and progress.",
+                    image: "images/tech_union.png",
+                    strength: "High",
+                    detail: "Detailed description for Tech Union.",
+                    leader: "CEO Angela Wong",
+                    location: "Global"
+                }
+            ];
+
+            const factionGrid = document.querySelector(".faction-grid");
+
+            factions.forEach(faction => {
+                const item = document.createElement("div");
+                item.classList.add("faction-item");
+                item.dataset.name = faction.name;
+                item.dataset.description = faction.description;
+                item.dataset.strength = faction.strength;
+                item.dataset.detail = faction.detail;
+                item.dataset.leader = faction.leader;
+                item.dataset.location = faction.location;
+
+                const img = document.createElement("img");
+                img.src = faction.image;
+                img.alt = faction.name; // Set alt attribute for accessibility
+
+                const h2 = document.createElement("h2");
+                h2.textContent = faction.name;
+
+                const description = document.createElement("p");
+                description.textContent = faction.description;
+
+                const strengthLevel = document.createElement("p");
+                strengthLevel.classList.add("strength-level");
+                strengthLevel.textContent = `Strength Level: ${faction.strength}`;
+
+                item.appendChild(img);
+                item.appendChild(h2);
+                item.appendChild(description);
+                item.appendChild(strengthLevel);
+
+                item.addEventListener("click", function() {
+                    const modal = document.getElementById("factionModal");
+                    const modalImage = document.getElementById("modalImage");
+                    const modalName = document.getElementById("modalName");
+                    const modalStrength = document.getElementById("modalStrength");
+                    const modalDescription = document.getElementById("modalDescription");
+                    const modalLeader = document.getElementById("modalLeader");
+                    const modalLocation = document.getElementById("modalLocation");
+
+                    modal.style.display = "block";
+                    modalImage.src = faction.image;
+                    modalImage.alt = faction.name;
+                    modalName.textContent = faction.name;
+                    modalStrength.textContent = `Strength Level: ${faction.strength}`;
+                    modalDescription.textContent = faction.detail;
+                    modalLeader.textContent = `Leader: ${faction.leader}`;
+                    modalLocation.textContent = `Location: ${faction.location}`;
+                });
+
+                factionGrid.appendChild(item);
+            });
+
+            const modal = document.getElementById("factionModal");
+            const closeBtn = document.querySelector(".close");
+
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            // Handling Back Button
+            const backButton = document.getElementById("backButton");
+
+            backButton.addEventListener("click", function() {
+                window.location.href = "main.html"; // Replace with your main page URL
+            });
+        });
+    </script>
+</body>
+</html>

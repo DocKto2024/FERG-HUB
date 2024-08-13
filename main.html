@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows XP Desktop</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #008080; /* Windows XP default background color */
+        }
+
+        .desktop {
+            background-image: url('Images/windows.png'); /* Windows XP background image */
+            background-size: cover;
+            background-position: center;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .taskbar {
+            background-color: #1a1a1a; /* Taskbar color */
+            width: 100%;
+            height: 40px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .start-menu {
+            position: absolute;
+            bottom: 40px;
+            left: calc(50% - 150px); /* Centered start menu */
+            width: 300px;
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            display: none;
+            padding: 10px;
+        }
+
+        .start-menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .start-menu li {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .start-menu li:hover {
+            background-color: #e0e0e0;
+        }
+
+        .start-menu li:first-child {
+            border-bottom: 1px solid #000;
+        }
+
+        .start-menu li:last-child {
+            border-top: 1px solid #000;
+        }
+
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-color: transparent; /* Transparent background */
+            border: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            text-align: center;
+            color: #000;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px; /* Added margin for spacing */
+        }
+
+        .desktop-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 5px;
+            margin-bottom: 5px; /* Space between icon and text */
+        }
+
+        .desktop-icon:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Light transparent background on hover */
+        }
+
+        /* Arrange desktop icons */
+        .desktop-icon:nth-child(1) {
+            top: 100px;
+            left: 100px;
+        }
+
+        .desktop-icon:nth-child(2) {
+            top: 100px;
+            left: 250px;
+        }
+
+        .desktop-icon:nth-child(3) {
+            top: 250px;
+            left: 100px;
+        }
+
+        .desktop-icon:nth-child(4) {
+            top: 250px;
+            left: 250px;
+        }
+
+        .desktop-icon:nth-child(5) {
+            top: 400px; /* Adjusted top position */
+            left: 100px;
+        }
+
+        .desktop-icon:nth-child(6) {
+            top: 400px; /* Adjusted top position */
+            left: 250px;
+        }
+
+        .desktop-icon:nth-child(7) {
+            top: 550px; /* Adjusted top position */
+            left: 100px;
+        }
+
+        .windows-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 100;
+        }
+
+        .windows-menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .windows-menu-content {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .password-input {
+            width: 80%;
+            padding: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .password-submit {
+            padding: 5px 10px;
+            font-size: 14px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Desktop icons with links -->
+        <div class="desktop-icon">
+            <a href="entities.html">
+                <img src="Images/FERG_ENTITIES.png" alt="FERG_ENTITIES">
+                <div>entities</div>
+            </a>
+        </div>
+        <div class="desktop-icon">
+            <a href="factions.html">
+                <img src="Images/FERG_DIPLOMACY.png" alt="FERG_DIPLOMACY">
+                <div>factions</div>
+            </a>
+        </div>
+        <div class="desktop-icon">
+            <a href="employees.html">
+                <img src="Images/FERG_DATA_BASE.png" alt="FERG_DATA_BASE">
+                <div>employees</div>
+            </a>
+        </div>
+        <div class="desktop-icon" id="classifiedIcon">
+            <a href="#" onclick="showPasswordPrompt()">
+                <img src="Images/FERG_INCIDENTS.png" alt="FERG_INCIDENTS">
+                <div>classified</div>
+            </a>
+        </div>
+        <!-- YouTube button -->
+        <div class="desktop-icon">
+            <a href="#" onclick="openYouTube()">
+                <img src="Images/skeleton.png" alt="YouTube">
+                <div>FUN =)</div>
+            </a>
+        </div>
+        <!-- Videos button -->
+        <div class="desktop-icon">
+            <a href="videos.html">
+                <img src="Images/FERG_DATA_BASE.png" alt="Videos">
+                <div>videos</div>
+            </a>
+        </div>
+        <!-- Persons of Interest button -->
+        <div class="desktop-icon">
+            <a href="persons_of_interest.html">
+                <img src="Images/FERG_DATA_BASE.png" alt="FERG_DATA_BASE">
+                <div>POI</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Taskbar (without Start button) -->
+    <div class="taskbar">
+        <div class="start-menu" id="startMenu">
+            <ul>
+                <li>My Account</li>
+                <li>Settings</li>
+                <li>Log Out</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Windows XP Style Menu for Password Prompt -->
+    <div class="windows-menu" id="passwordMenu">
+        <div class="windows-menu-header">
+            Windows XP Password Prompt
+        </div>
+        <div class="windows-menu-content">
+            <label for="password">Enter the password:</label>
+            <input type="password" id="password" class="password-input">
+            <button class="password-submit" onclick="checkPassword()">Submit</button>
+            <button class="password-submit" onclick="closePasswordPrompt()">Close</button>
+        </div>
+    </div>
+
+    <!-- Script to toggle start menu and handle classified icon -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var startMenuButton = document.createElement("div");
+            startMenuButton.className = "start-menu-button";
+            startMenuButton.textContent = "Start";
+            startMenuButton.addEventListener("click", function() {
+                var startMenu = document.getElementById("startMenu");
+                if (startMenu.style.display === "block") {
+                    startMenu.style.display = "none";
+                } else {
+                    startMenu.style.display = "block";
+                }
+            });
+            document.body.appendChild(startMenuButton);
+        });
+
+        function showPasswordPrompt() {
+            var passwordMenu = document.getElementById("passwordMenu");
+            passwordMenu.style.display = "block";
+        }
+
+        function checkPassword() {
+            var password = document.getElementById("password").value;
+            if (password === "FERG_CLASSIFIED") {
+                // Redirect to the classified page
+                window.location.href = "classified.html";
+            } else {
+                alert("Incorrect password. Please try again.");
+            }
+        }
+
+        function closePasswordPrompt() {
+            var passwordMenu = document.getElementById("passwordMenu");
+            passwordMenu.style.display = "none";
+            document.getElementById("password").value = "";
+        }
+
+        function openYouTube() {
+            window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");
+        }
+    </script>
+</body>
+</html>
+

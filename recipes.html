@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backrooms Recipe Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/background.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        .entities-container {
+            position: relative;
+            max-width: 800px;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: #ffffff;
+            border: 1px solid #999;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 200px;
+            margin-bottom: 1em;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #003399;
+            margin-bottom: 0.5em;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .entity-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 20px;
+        }
+
+        .entity-item {
+            width: calc(33.33% - 20px);
+            margin: 1em;
+            padding: 1em;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .entity-item h2 {
+            font-size: 1.2em;
+            color: #003399;
+            margin: 0.5em 0;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            max-width: 80%;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            color: #333;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #003399;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #001f4d;
+        }
+
+        .menu-text {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .menu-text p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .menu-text a {
+            color: #003399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .menu-text a:hover {
+            text-decoration: underline;
+        }
+
+        #modalIngredients {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        #modalRecipe {
+            padding-left: 20px;
+            list-style-type: decimal;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-image"></div>
+
+    <div class="entities-container">
+        <img src="images/FERG_ENTITIES.png" alt="FERG_ENTITIES" class="logo">
+        <h1>Backrooms Recipe Book</h1>
+        <div class="entity-grid"></div>
+        <div class="menu-text">
+            <p>If you want to see more details click <a href="https://trello.com/b/gGkgK5Vl/ferg-entities-data-base">here</a></p>
+        </div>
+    </div>
+
+    <div id="entityModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalName">Dish Name</h2>
+            <p id="modalDescription">Detailed description.</p>
+            <h3>Ingredients:</h3>
+            <ul id="modalIngredients"></ul>
+            <h3>Recipe:</h3>
+            <ol id="modalRecipe"></ol>
+        </div>
+    </div>
+
+    <button id="backButton" class="back-button">Back to Main</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const entities = [
+                {
+                    name: "Sprinter Stew",
+                    description: "A nourishing stew made from Sprinter meat, ideal for restoring energy during long journeys in the Backrooms.",
+                    ingredients: [
+                        "1 liter of almond water",
+                        "500 grams of Sprinter meat",
+                        "200 grams of edible mushrooms",
+                        "1 Royal Ration",
+                        "Some mold for flavor"
+                    ],
+                    recipe: [
+                        "Pour almond water into a pot and bring to a boil.",
+                        "Add chopped Sprinter meat and simmer for 20 minutes.",
+                        "Add chopped edible mushrooms and mold, and simmer for another 10 minutes.",
+                        "Finally, add the mashed Royal Ration, mix well, and simmer for another 5 minutes."
+                    ]
+                },
+                {
+                    name: "Reaper Soup",
+                    description: "A hearty and aromatic soup made from Reaper meat, perfect for maintaining strength during long Backrooms expeditions.",
+                    ingredients: [
+                        "1 liter of almond water",
+                        "400 grams of Reaper meat",
+                        "150 grams of edible mushrooms",
+                        "2 food bars",
+                        "Spices (dried mushrooms, moss)"
+                    ],
+                    recipe: [
+                        "Pour almond water into a pot and bring to a boil.",
+                        "Add chopped Reaper meat and simmer for 25 minutes.",
+                        "Add chopped edible mushrooms and simmer for another 10 minutes.",
+                        "Break food bars into pieces and add to the soup.",
+                        "Finally, add spices and simmer for another 5 minutes."
+                    ]
+                },
+                {
+                    name: "Watcher Casserole",
+                    description: "A savory casserole made from Watcher meat, providing a rich taste and nourishment.",
+                    ingredients: [
+                        "1 liter of almond water",
+                        "300 grams of Watcher meat",
+                        "250 grams of edible mushrooms",
+                        "Some mold for flavor",
+                        "Spices (leaves, dried mushrooms)"
+                    ],
+                    recipe: [
+                        "Pour almond water into a pot and bring to a boil.",
+                        "Add chopped Watcher meat and simmer for 20 minutes.",
+                        "Add chopped edible mushrooms and simmer for another 10 minutes.",
+                        "Add mold and spices, and simmer for another 5 minutes."
+                    ]
+                },
+                {
+                    name: "Zerg Soup",
+                    description: "A light and nutritious soup made from Zerg meat, perfect for restoring strength and satisfying hunger in the Backrooms.",
+                    ingredients: [
+                        "1 liter of almond water",
+                        "350 grams of Zerg meat",
+                        "200 grams of edible mushrooms",
+                        "1 Royal Ration",
+                        "Spices (dried leaves, moss)"
+                    ],
+                    recipe: [
+                        "Pour almond water into a pot and bring to a boil.",
+                        "Add chopped Zerg meat and simmer for 20 minutes.",
+                        "Add chopped edible mushrooms and simmer for another 10 minutes.",
+                        "Finally, add mashed Royal Ration and spices, and simmer for another 5 minutes."
+                    ]
+                }
+            ];
+
+            const entityGrid = document.querySelector(".entity-grid");
+
+            entities.forEach(entity => {
+                const item = document.createElement("div");
+                item.classList.add("entity-item");
+                item.dataset.name = entity.name;
+                item.dataset.description = entity.description;
+                item.dataset.ingredients = JSON.stringify(entity.ingredients);
+                item.dataset.recipe = JSON.stringify(entity.recipe);
+
+                const h2 = document.createElement("h2");
+                h2.textContent = entity.name;
+
+                item.appendChild(h2);
+
+                item.addEventListener("click", function() {
+                    const modal = document.getElementById("entityModal");
+                    const modalName = document.getElementById("modalName");
+                    const modalDescription = document.getElementById("modalDescription");
+                    const modalIngredients = document.getElementById("modalIngredients");
+                    const modalRecipe = document.getElementById("modalRecipe");
+
+                    modal.style.display = "block";
+                    modalName.textContent = entity.name;
+                    modalDescription.textContent = entity.description;
+
+                    // Display Ingredients
+                    modalIngredients.innerHTML = "";
+                    JSON.parse(entity.ingredients).forEach(ingredient => {
+                        const li = document.createElement("li");
+                        li.textContent = ingredient;
+                        modalIngredients.appendChild(li);
+                    });
+
+                    // Display Recipe Steps
+                    modalRecipe.innerHTML = "";
+                    JSON.parse(entity.recipe).forEach((step, index) => {
+                        const li = document.createElement("li");
+                        li.textContent = step;
+                        modalRecipe.appendChild(li);
+                    });
+                });
+
+                entityGrid.appendChild(item);
+            });
+
+            const modal = document.getElementById("entityModal");
+            const closeBtn = document.querySelector(".close");
+
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+
+            window.addEventListener("click", function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            const backButton = document.getElementById("backButton");
+
+            backButton.addEventListener("click", function() {
+                window.location.href = "main.html";
+            });
+        });
+    </script>
+</body>
+</html>
